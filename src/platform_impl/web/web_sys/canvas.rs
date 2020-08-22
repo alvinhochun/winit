@@ -236,6 +236,7 @@ impl Canvas {
         F: 'static + FnMut(i32, MouseButton, ModifiersState),
     {
         if has_pointer_event() {
+            let canvas = self.raw.clone();
             self.on_pointer_release = Some(self.add_user_event(
                 "pointerup",
                 move |event: PointerEvent| {
@@ -244,6 +245,9 @@ impl Canvas {
                         event::mouse_button(&event),
                         event::mouse_modifiers(&event),
                     );
+                    canvas
+                        .release_pointer_capture(event.pointer_id())
+                        .expect("Failed to release pointer capture");
                 },
             ));
         } else {
@@ -263,6 +267,7 @@ impl Canvas {
         F: 'static + FnMut(i32, PhysicalPosition<f64>, MouseButton, ModifiersState),
     {
         if has_pointer_event() {
+            let canvas = self.raw.clone();
             self.on_pointer_press = Some(self.add_user_event(
                 "pointerdown",
                 move |event: PointerEvent| {
@@ -272,6 +277,9 @@ impl Canvas {
                         event::mouse_button(&event),
                         event::mouse_modifiers(&event),
                     );
+                    canvas
+                        .set_pointer_capture(event.pointer_id())
+                        .expect("Failed to set pointer capture");
                 },
             ));
         } else {
